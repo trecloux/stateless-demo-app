@@ -1,0 +1,31 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<http security="none" pattern="/scripts/**" />
+	<http security="none" pattern="/styles/**" />
+	<http security="none" pattern="/images/**" />
+	<http security="none" pattern="/favicon.ico" />
+	<http security="none" pattern="/security/**" />
+
+	<http auto-config="false" use-expressions="true" create-session="stateless">
+		<intercept-url pattern="/**" access="isAuthenticated()" />
+
+		<form-login login-page="/security/login.jsp"
+			default-target-url="/" authentication-failure-url="/security/login.jsp?login_error=1" />
+		<logout logout-success-url="/security/login.jsp" />
+
+		<remember-me key="myRememberMeKey" />
+
+	</http>
+
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				<user name="sheldon" password="cooper" authorities="" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+
+</beans:beans>

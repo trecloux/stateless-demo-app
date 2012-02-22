@@ -1,0 +1,26 @@
+<dataset>
+	<table name="BOOKING">
+		<column>ID</column>
+		<column>CUSTOMER_EMAIL</column>
+		<column>BOOKING_DATE</column>
+		<row>
+			<value>1</value>
+			<value>me@you.com</value>
+			<value>2011-01-02 00:00:00</value>
+		</row>
+	</table>
+	<table name="BOOKING_ITEM">
+		<column>ID</column>
+		<column>BOOKING</column>
+		<column>ITEM_LABEL</column>
+		<column>ITEM_UNIT_PRICE</column>
+		<column>QUANTITY</column>
+		<row>
+			<value>1</value>
+			<value>1</value>
+			<value>Beer</value>
+			<value>0.3</value>
+			<value>10</value>
+		</row>
+	</table>	
+</dataset>
