@@ -1,10 +1,8 @@
 package fr.letitzen.demo.web;
 
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.validation.Valid;
-
+import fr.letitzen.demo.domain.Booking;
+import fr.letitzen.demo.domain.BookingItem;
+import fr.letitzen.demo.service.BookingService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,10 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import fr.letitzen.demo.domain.Booking;
-import fr.letitzen.demo.domain.BookingItem;
-import fr.letitzen.demo.service.BookingService;
+import javax.inject.Inject;
+import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 public class BookingController {
@@ -31,12 +30,11 @@ public class BookingController {
 	}
 	
 	@RequestMapping(value="/bookings/{page}", method=RequestMethod.GET)
-	public String list(Model model, @PathVariable Integer page,  @RequestParam(required=false) String info)  {
+	public String list(Model model, @PathVariable Integer page)  {
 		Pager pager = new Pager(page, bookingService.countAll());
 		List<Booking> bookings = bookingService.findAll(pager);
 		model.addAttribute("bookings", bookings);
 		model.addAttribute("pager", pager);
-		model.addAttribute("info", info);
 		return "booking/list";
 	}
 	
@@ -58,7 +56,7 @@ public class BookingController {
 
 	
 	@RequestMapping(value="/booking", method=RequestMethod.POST)
-	public String save(Model model, @Valid Booking cleanBbooking, Errors errors)  {
+	public String save(Model model, @Valid Booking cleanBbooking, Errors errors, RedirectAttributes redirectAttributes)  {
 		if (errors.hasErrors()) {
 			model.addAttribute("booking", cleanBbooking);
 			return "booking/view";
@@ -67,17 +65,17 @@ public class BookingController {
 			item.setBooking(cleanBbooking);
 		}
 		bookingService.save(cleanBbooking);
-		model.addAttribute("info", "saved");
+        redirectAttributes.addFlashAttribute("info", "saved");
 		return "redirect:/bookings/1";
 	}
 	
 	@RequestMapping(value="/booking", method=RequestMethod.DELETE)
-	public String delete(Model model, @RequestParam Long id)  {
+	public String delete(Model model, @RequestParam Long id, RedirectAttributes redirectAttributes)  {
 		try {
 			bookingService.deleteById(id);
 		} catch (DataIntegrityViolationException e) {
 		}
-		model.addAttribute("info", "deleted");
+		redirectAttributes.addFlashAttribute("info", "deleted");
 		return "redirect:/bookings/1";
 	}	
 	

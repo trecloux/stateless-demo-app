@@ -27,5 +27,9 @@
 		<beans:property name="basename" value="classpath:messages" />
 		<beans:property name="cacheSeconds" value="0" />
 	</beans:bean>
+
+    <beans:bean id="flashMapManager" class="com.github.trecloux.flashcookie.CookieFlashMapManager">
+        <beans:constructor-arg value="myPassword"/>
+    </beans:bean>
 		
 </beans:beans>

@@ -1,16 +1,5 @@
 package fr.letitzen.demo.web;
 
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.view;
-
-import java.sql.SQLException;
-
-import javax.inject.Inject;
-import javax.sql.DataSource;
-
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
@@ -22,10 +11,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.server.MockMvc;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
+
+import javax.inject.Inject;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
@@ -34,7 +32,8 @@ import org.springframework.web.context.WebApplicationContext;
 @Transactional		
 public class BookingControllerTest {
 	
-	@Inject
+	@SuppressWarnings("SpringJavaAutowiringInspection")
+    @Inject
 	WebApplicationContext wac;
 	@Inject
 	DataSource dataSource;	
@@ -58,9 +57,10 @@ public class BookingControllerTest {
 	
 	@Test
 	public void shouldPageBookingsWithMessage() throws Exception {
-		mockMvc.perform(get("/bookings/1").param("info", "saved"))
+		mockMvc.perform(get("/bookings/1"))
+            .andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(model().attributeExists("bookings", "pager", "info"))
+			.andExpect(model().attributeExists("bookings", "pager"))
 			.andExpect(view().name("booking/list"));
 	}	
 	
@@ -74,13 +74,15 @@ public class BookingControllerTest {
 	@Test
 	public void shouldSaveABooking() throws Exception {
 		mockMvc.perform(post("/booking").param("id", "1"))
-			.andExpect(redirectedUrl("/bookings/1?info=saved"));
+			.andExpect(redirectedUrl("/bookings/1"))
+            .andExpect(flash().attribute("info", "saved"));
 	}
 	
 	@Test
 	public void shouldDeleteABooking() throws Exception {
 		mockMvc.perform(delete("/booking").param("id", "1"))
-			.andExpect(redirectedUrl("/bookings/1?info=deleted"));
+			.andExpect(redirectedUrl("/bookings/1"))
+            .andExpect(flash().attribute("info","deleted"));
 	}
 	
 	
@@ -99,7 +101,7 @@ public class BookingControllerTest {
 	
 	@Before
 	public void mockMvc() {
-		this.mockMvc = MockMvcBuilders.webApplicationContextSetup(this.wac).build();		
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 	}
 	
 }
